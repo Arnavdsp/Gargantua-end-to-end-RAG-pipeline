@@ -1,5 +1,5 @@
 # Gargantua-end-to-end-RAG-pipeline
-#GARGANTUA
+# GARGANTUA
 
 **Document intelligence rendered as a Schwarzschild raytracer.**
 
