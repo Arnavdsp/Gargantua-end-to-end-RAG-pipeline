@@ -43,14 +43,16 @@ def retrieve(
     vector_store: VectorStore,
     reranker: Reranker,
     settings: Settings,
+    top_k: int | None = None,
 ) -> RetrievalResult:
     query_embedding = model_service.embed([question])[0]
 
-    initial = vector_store.search(document_id, query_embedding, top_k=settings.retrieval_top_k)
+    final_k = top_k or settings.rerank_top_k
+    initial = vector_store.search(document_id, query_embedding, top_k=max(settings.retrieval_top_k, final_k))
     if not initial:
         return RetrievalResult(candidates=[], top_score=0.0, grounding=GroundingLevel.NONE)
 
-    reranked = reranker.rerank(question, initial, top_k=settings.rerank_top_k)
+    reranked = reranker.rerank(question, initial, top_k=final_k)
     top_score = reranked[0].score if reranked else 0.0
     grounding = classify_grounding(top_score, min_relevance=settings.min_relevance_score)
     return RetrievalResult(candidates=reranked, top_score=top_score, grounding=grounding)
