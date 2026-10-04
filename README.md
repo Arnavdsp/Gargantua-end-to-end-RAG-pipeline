@@ -8,7 +8,8 @@ observer toward the mass. Most fall past the horizon; a few strike the disk
 and light up. Those hot spots are your citations.
 
 The black hole and the RAG system are one program: every simulation parameter
-comes from real retrieval state, and every number on screen is measured.
+comes from real retrieval state, and every number on screen is measured or
+explicitly marked as an estimate.
 
 <p align="center">
   <img src="docs/poster.png" alt="The GARGANTUA render: an accretion disk lensed over the shadow of a black hole, with the photon ring visible and citation hot spots on the disk." width="820">
@@ -89,9 +90,9 @@ Each element of the simulation is bound to one value from the API:
 The whole table lives in one file, [`frontend/src/sim/mapping.ts`](frontend/src/sim/mapping.ts).
 Nothing downstream of it invents a value.
 
-Ingestion is the collapse sequence. The nine `ProcessingStage` values
-(`uploading → validating → extracting → ocr → chunking → embedding → indexing →
-ready`) drive the disk igniting from the inside out, from the real
+Ingestion is the collapse sequence. `ProcessingStage` has nine values,
+including `failed`; the eight success stages (`uploading → validating →
+extracting → ocr → chunking → embedding → indexing → ready`) drive the disk igniting from the inside out, from the real
 `/api/jobs/{id}` poll at 900 ms. There is no timer filling in the gap between
 polls and no easing toward the next stage. If the backend sits on `embedding`
 for two minutes, the collapse sits there too.
@@ -167,8 +168,9 @@ POST   /api/documents/{id}/translate      -> TranslateResponse
 
 ## Rules the UI follows
 
-Every number on screen is measured. Where a value isn't, the HUD shows an
-em-dash, as the reference interface does. There is
+Every number on screen is measured, with one marked exception: `DISK
+PARTICLES` is an estimate and shows a `~` (see Known limits). Where a value
+isn't available, the HUD shows an em-dash, as the reference interface does. There is
 no code path that turns a null into a zero, a placeholder or a plausible-looking
 default.
 
